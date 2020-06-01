@@ -2,7 +2,7 @@ import axios from 'axios';
 import router from "../router";
 import ElementUI from 'element-ui';
 
-axios.defaults.baseURL = "/api";
+axios.defaults.baseURL = "/rms-api";
 
 axios.interceptors.request.use((req) => {
   let token = sessionStorage.getItem("token")
@@ -17,7 +17,34 @@ axios.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   if (response.status == 200) {
     let result = response.data;
-    if (result.ecode != 0) {
+    //登录超时机制
+    if (result.ecode == 30007007) {
+      if (window.loginTimeout == undefined) {
+        window.loginTimeout = true;
+        sessionStorage.getItem("loginTimeout")
+        ElementUI.MessageBox({
+          title: "提示",
+          message: "登录超时",
+          confirmButtonText: "确定",
+          showClose: false,
+          closeOnClickModal: false,
+
+          type: 'warning',
+          customClass: 'data-error-alert',
+        }).then(action => {
+
+          window.loginTimeout = undefined;
+          sessionStorage.removeItem("user");
+          sessionStorage.removeItem("token");
+
+          router.replace({
+            path: '/'
+          });
+
+        });
+      }
+
+    } else if (result.ecode != 0) {
       ElementUI.Notification.error({
         title: '错误',
         message: `${result.message}`

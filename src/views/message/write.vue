@@ -11,10 +11,21 @@
         <el-input v-model="message.sendUser"></el-input>
       </el-form-item>
       <el-form-item label="收件人">
-        <el-select v-model="message.recipients" multiple placeholder="请选择收件人">
-          <el-option label="张三" value="2"></el-option>
-          <el-option label="李四" value="3"></el-option>
-        </el-select>
+        <remote-select
+          multiple
+          :requestData="queryUserList"
+          v-model="message.recipients"
+          placeholder="请选择收件人"
+        >
+          <template slot-scope="scope">
+            <el-option
+              v-for="user in scope.list"
+              :key="user.userId"
+              :value="user.userId"
+              :label="user.userName"
+            ></el-option>
+          </template>
+        </remote-select>
       </el-form-item>
       <el-form-item label="主题">
         <el-input v-model="message.messageTitle"></el-input>
@@ -32,10 +43,13 @@
 </template>
 <script>
 import messageApi from "../../api/message";
+import userApi from "../../api/user";
+
 import Tinymce from "@/components/Tinymce";
+import RemoteSelect from "@/components/RemoteSelect";
 
 export default {
-  components: { Tinymce },
+  components: { Tinymce, RemoteSelect },
   data() {
     return {
       message: {
@@ -53,8 +67,8 @@ export default {
     console.info("create");
   },
   methods: {
-    toPage(path) {
-      this.$router.push({ path });
+    queryUserList(param) {
+      return userApi.list(param);
     },
     createFormalMessage() {
       this.message.richContent += " rich:" + Date.now();

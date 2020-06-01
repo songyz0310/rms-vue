@@ -7,6 +7,7 @@
       background-color="#545c64"
       text-color="#fff"
       active-text-color="#ffd04b"
+      :collapse="menuObj.isCollapse"
     >
       <el-submenu index="1">
         <template slot="title">
@@ -29,9 +30,17 @@
 </template>
 <script>
 export default {
+  props: {
+    menuObj: {
+      type: Object,
+      default: {
+        isCollapse: true
+      }
+    }
+  },
   data() {
     return {
-      defaultActive: "1-3",
+      defaultActive: "1-2",
       defaultOpen: ["1"]
     };
   },

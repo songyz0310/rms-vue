@@ -40,9 +40,11 @@ export default {
   methods: {
     onSubmit() {
       console.log("submit!");
-      userApi.login(this.form).then(token => {
-        sessionStorage.setItem("token", token);
-        this.$router.push({path: "/message/send"});
+      userApi.login(this.form).then(user => {
+        sessionStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.setItem("token", user.token);
+
+        this.$router.push({ path: "/message/send" });
       });
     }
   }
