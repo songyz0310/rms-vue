@@ -31,9 +31,7 @@ export default {
     return {
       form: {
         account: null,
-        password: null,
-
-        desc: ""
+        password: null
       }
     };
   },

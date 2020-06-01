@@ -127,10 +127,6 @@ export default {
             this.loading = false;
             this.list = this.list.concat(result.data);
 
-            if (this.pageParam.needTotal) {
-              this.total = result.total;
-            }
-
             this.isAll = this.list.length == this.total;
           })
           .catch(err => {
@@ -140,9 +136,6 @@ export default {
     },
     //搜索框有内容时，收起下拉框时，刷新数据，以防止下次展开数据是上次搜索的结果
     toggleVisible(flag) {
-      if (flag == false && this.pageParam.search != undefined) {
-        this.queryList();
-      }
     }
   },
   watch: {
