@@ -26,6 +26,11 @@
 
 .page-header {
   height: 35px !important;
+  padding: 0;
+}
+
+.page-main {
+  padding: 0;
 }
 
 .clear-padding {

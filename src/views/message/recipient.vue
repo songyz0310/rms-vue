@@ -1,6 +1,6 @@
 <template>
   <el-container class="page-container">
-    <el-header class="clear-padding page-header">
+    <el-header class="page-header">
       <el-row>
         <el-button size="small" type="warning" @click="deleteMessage">删除</el-button>
         <el-button size="small" type="danger">彻底删除</el-button>
@@ -19,7 +19,7 @@
         </el-dropdown>
       </el-row>
     </el-header>
-    <el-main class="clear-padding">
+    <el-main class="page-main">
       <data-table ref="dataTable" :requestData="queryMessageList" rowKey="messageId">
         <el-table-column prop="messageId" type="selection" width="55"></el-table-column>
         <el-table-column prop="sendUser.userName" label="发送人" width="100"></el-table-column>
