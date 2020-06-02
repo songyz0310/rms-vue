@@ -133,7 +133,7 @@ export default {
             type: "success"
           })
             .then(() => {
-              this.$router.push({ path: "/message/send" });
+              this.$router.push({ path: "/message/sended" });
             })
             .catch(() => {
               this.messageForm.messageId = null;

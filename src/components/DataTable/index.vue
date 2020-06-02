@@ -13,6 +13,7 @@
         style="width: 100%"
         :data="tableData.data"
         @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
       >
         <slot />
       </el-table>
@@ -53,6 +54,8 @@ export default {
       height: null,
       tableData: {
         data: null,
+        sort: null,
+        search: null,
         total: 0,
         pageNo: 1,
         pageSize: 10,
@@ -63,23 +66,25 @@ export default {
     };
   },
   created: function() {
-    console.info("表格组件初始化");
-
     this.queryList().then(() => (this.tableData.needTotal = false));
   },
   mounted() {
     this.height = this.$refs.elMain.$el.clientHeight - 36;
-    console.info(this.height);
   },
   methods: {
     getSelectRows() {
       return this.multipleSelection.map(row => row[this.rowKey]);
+    },
+    refreshData() {
+      return this.queryList();
     },
     queryList() {
       let param = {};
       param.pageNo = this.tableData.pageNo;
       param.pageSize = this.tableData.pageSize;
       param.needTotal = this.tableData.needTotal;
+      param.sort = this.tableData.sort;
+      param.search = this.tableData.search;
       this.loading = true;
       this.tableData.data = [];
       return this.requestData(param)
@@ -105,15 +110,32 @@ export default {
       }
     },
     handleSelectionChange(val) {
+      console.info("============修改选中行数============");
       console.info(val);
       this.multipleSelection = val;
     },
+    handleSortChange({ column, prop, order }) {
+      console.info("============修改排序规则============");
+      console.info(column);
+      console.info(prop);
+      console.info(order);
+      if (order == "ascending") {
+        this.tableData.sort = "+" + prop;
+      } else if (order == "descending") {
+        this.tableData.sort = "-" + prop;
+      } else {
+        this.tableData.sort = null;
+      }
+      this.queryList();
+    },
     handleSizeChange(val) {
+      console.info("============修改每页条数============");
       this.tableData.pageSize = val;
       console.log(`每页 ${val} 条`);
       this.queryList();
     },
     handleCurrentChange(val) {
+      console.info("============修改当前页数============");
       this.tableData.pageNo = val;
       console.log(`当前页: ${val}`);
       this.queryList();

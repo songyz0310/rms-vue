@@ -2,8 +2,8 @@
   <el-container class="page-container">
     <el-header class="page-header">
       <el-row>
-        <el-button size="small" type="warning" @click="deleteMessage">删除</el-button>
-        <el-button size="small" type="danger">彻底删除</el-button>
+        <el-button size="small" type="warning" @click="showDeleteConfirm">删除</el-button>
+        <el-button size="small" type="danger" @click="showRealDeleteConfirm">彻底删除</el-button>
         <el-button size="small" type="success">转发</el-button>
         <el-button size="small" type="primary">回复</el-button>
         <el-dropdown>
@@ -20,7 +20,7 @@
       </el-row>
     </el-header>
     <el-main class="page-main">
-      <data-table ref="dataTable" :requestData="queryMessageList" rowKey="messageId">
+      <data-table ref="dataTable" :requestData="queryMessageList" rowKey="mrId">
         <el-table-column prop="messageId" type="selection" width="55"></el-table-column>
         <el-table-column prop="sendUser.userName" label="发送人" width="100"></el-table-column>
         <el-table-column label="发送时间" width="200">
@@ -45,9 +45,55 @@ export default {
     queryMessageList(param) {
       return messageApi.recipientList(param);
     },
+    showDeleteConfirm() {
+      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+        this.$notify({
+          title: "警告",
+          message: "请选择信息",
+          type: "warning"
+        });
+        return;
+      }
+
+      this.$confirm("此操作将该文件移动到已删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => this.deleteMessage());
+    },
+    showRealDeleteConfirm() {
+      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+        this.$notify({
+          title: "警告",
+          message: "请选择信息",
+          type: "warning"
+        });
+        return;
+      }
+
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => this.realDeleteMessage());
+    },
     deleteMessage() {
-      console.info("进入删除方法");
-      console.info(this.$refs["dataTable"].getSelectRows());
+      let ids = this.$refs["dataTable"].getSelectRows();
+      messageApi
+        .deleteRecipientMessage({ ids })
+        .then(result => {
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+        })
+        .then(() => this.$refs["dataTable"].refreshData());
+    },
+    realDeleteMessage() {
+      let ids = this.$refs["dataTable"].getSelectRows();
+      messageApi
+        .realDeleteRecipientMessage({ ids })
+        .then(result => this.$refs["dataTable"].refreshData());
     }
   }
 };

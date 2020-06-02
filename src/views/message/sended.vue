@@ -2,16 +2,28 @@
   <el-container class="page-container">
     <el-header class="page-header">
       <el-row>
-        <el-button size="small" type="warning">删除</el-button>
+        <el-button size="small" type="warning" @click="deleteMessage">删除</el-button>
         <el-button size="small" type="danger">彻底删除</el-button>
         <el-button size="small" type="success">转发</el-button>
       </el-row>
     </el-header>
     <el-main class="page-main">
-      <data-table :requestData="queryMessageList">
+      <data-table ref="dataTable" :requestData="queryMessageList" rowKey="messageId">
         <el-table-column prop="messageId" type="selection" width="55"></el-table-column>
-        <el-table-column prop="messageTitle" label="邮件标题" width="300"></el-table-column>
-        <el-table-column prop="sendTime" label="发送时间" width="200">
+        <el-table-column
+          prop="messageTitle"
+          label="邮件标题"
+          sortable
+          :sort-orders="['ascending', 'descending']"
+          width="300"
+        ></el-table-column>
+        <el-table-column
+          prop="sendTime"
+          label="发送时间"
+          sortable
+          :sort-orders="['ascending', 'descending']"
+          width="200"
+        >
           <template slot-scope="scope">{{ scope.row.sendTime }}</template>
         </el-table-column>
         <el-table-column prop="recipientUsers" label="收件人">
@@ -38,6 +50,21 @@ export default {
   methods: {
     queryMessageList(param) {
       return messageApi.sendedList(param);
+    },
+    deleteMessage() {
+      console.info("进入删除方法");
+      let ids = this.$refs["dataTable"].getSelectRows();
+      if (ids.length == 0) {
+        this.$notify({
+          title: "警告",
+          message: "请选择信息",
+          type: "warning"
+        });
+        return;
+      }
+      messageApi
+        .deleteMessage({ ids })
+        .then(result => this.$refs["dataTable"].refreshData());
     }
   }
 };
