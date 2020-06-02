@@ -7,12 +7,13 @@ import recipientMessagePage from '../views/message/recipient';
 import sendedMessagePage from '../views/message/sended';
 import writeMessagePage from '../views/message/write';
 import draftMessagePage from '../views/message/draft';
+import rubbishMessagePage from '../views/message/rubbish';
+import deletedMessagePage from '../views/message/deleted';
 
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
+  routes: [{
       path: '/',
       name: 'login',
       component: login
@@ -38,6 +39,14 @@ export default new Router({
         path: '/message/draft',
         name: 'draftMessagePage',
         component: draftMessagePage
+      }, {
+        path: '/message/rubbish',
+        name: 'rubbishMessagePage',
+        component: rubbishMessagePage
+      }, {
+        path: '/message/deleted',
+        name: 'deletedMessagePage',
+        component: deletedMessagePage
       }]
     },
 

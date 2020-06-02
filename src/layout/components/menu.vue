@@ -95,7 +95,7 @@ export default {
               name: "垃圾箱",
               icon: null,
               key: "rubishMessagePage",
-              path: "/message/rubish"
+              path: "/message/rubbish"
             },
             {
               name: "已删除",
