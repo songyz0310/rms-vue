@@ -1,6 +1,7 @@
 <template>
   <el-select
-    :loading="loading"
+    ref="elSelect"
+    v-loading="loading"
     :disabeld="disabled"
     :clearable="clearable"
     :multiple="multiple"
@@ -9,7 +10,6 @@
     :placeholder="placeholder"
     :style="{display}"
     :remote-method="queryList"
-    :value="value"
     v-model="value"
     v-loadmore="queryMoreList"
     @visible-change="toggleVisible"
@@ -19,9 +19,6 @@
 </template>
 <script>
 export default {
-  model: {
-    prop: "value"
-  },
   props: {
     requestData: {
       type: Function,
@@ -136,11 +133,24 @@ export default {
     },
     //搜索框有内容时，收起下拉框时，刷新数据，以防止下次展开数据是上次搜索的结果
     toggleVisible(flag) {
+      if (flag == false && this.pageParam.search != undefined) {
+        this.queryList();
+      }
+    },
+    doBlur() {
+      this.$refs.elSelect.blur();
     }
   },
   watch: {
-    value: function(value) {
-      this.$emit("input", value);
+    value: function(val) {
+      console.info("===========value=================");
+      console.info(val);
+      this.$emit("input", val);
+    },
+    "$attrs.value": function(val) {
+      console.info("==============$attrs.value==============");
+      console.info(val);
+      this.value = val;
     }
   }
 };

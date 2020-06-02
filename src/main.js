@@ -7,6 +7,9 @@ import router from './router'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+//引入项目样式文件
+import "./style/layout.css";
+
 Vue.config.productionTip = false
 Vue.use(ElementUI);
 
@@ -178,6 +181,8 @@ Vue.prototype.$message = Message;
 new Vue({
   el: '#app',
   router,
-  components: { App },
+  components: {
+    App
+  },
   template: '<App/>'
 })

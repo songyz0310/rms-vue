@@ -1,12 +1,6 @@
 <template>
   <div class="rms-header">
     <el-container>
-      <el-aside
-        class="rms-left"
-        :width="menuWidth"
-        style="transition: all 0.3s ease 0s;padding: 0px 10px;
-    text-align: center;"
-      >{{menuObj.isCollapse?'LG':'LOGO'}}</el-aside>
       <el-aside class="rms-left" width="200px">
         <span class="toggle-span">
           <i
@@ -40,15 +34,11 @@
 export default {
   props: {
     menuObj: {
-      type: Object,
-      default: {
-        isCollapse: true
-      }
+      type: Object
     }
   },
   data() {
     return {
-      menuWidth: "200px",
       ds: "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
       user: {
         userId: 0,
@@ -66,8 +56,6 @@ export default {
     this.user.userName = user.userName;
     this.user.account = user.account;
     this.user.email = user.email;
-
-    console.info("create");
   },
   methods: {
     handleCommand(cmd) {
@@ -81,18 +69,6 @@ export default {
         console.info("查询个人信息");
       }
     }
-  },
-  watch: {
-    menuObj: {
-      handler: function(val, oldval) {
-        if (val.isCollapse) {
-          this.menuWidth = "65px";
-        } else {
-          this.menuWidth = "200px";
-        }
-      },
-      deep: true //对象内部的属性监听，也叫深度监听
-    }
   }
 };
 </script>
@@ -101,9 +77,7 @@ export default {
   height: 100%;
   line-height: 45px;
 }
-.rms-left{
-  
-}
+
 .user-avatar {
   width: 40px;
   height: 40px;
@@ -111,7 +85,8 @@ export default {
   right: -40px;
 }
 .toggle-span {
-  font-size: 24px;
-  margin-left: 5px;
+  cursor: pointer;
+  font-size: 22px;
+  margin-left: 10px;
 }
 </style>

@@ -3,8 +3,6 @@
     <el-row style="margin-bottom:15px">
       <el-button size="small" type="warning">删除</el-button>
       <el-button size="small" type="danger">彻底删除</el-button>
-      <el-button size="small" type="success">转发</el-button>
-      <el-button size="small" type="primary">回复</el-button>
       <el-dropdown>
         <el-button size="small">
           标记

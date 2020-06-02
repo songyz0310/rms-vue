@@ -1,9 +1,6 @@
 <template>
   <div :class="{fullscreen:fullscreen}" class="tinymce-container" :style="{width:containerWidth}">
     <textarea :id="tinymceId" class="tinymce-textarea" />
-    <!-- <div class="editor-custom-btn-container">
-      <editorImage color="#1890ff" class="editor-upload-btn" @successCBK="imageSuccessCBK" />
-    </div>-->
   </div>
 </template>
 
@@ -33,7 +30,7 @@ export default {
         );
       }
     },
-    value: {
+    content: {
       type: String,
       default: ""
     },
@@ -45,7 +42,7 @@ export default {
       }
     },
     menubar: {
-      type: String,
+      type: [String],
       default: "file edit insert view format table"
     },
     height: {
@@ -84,7 +81,7 @@ export default {
     }
   },
   watch: {
-    value(val) {
+    content(val) {
       if (!this.hasChange && this.hasInit) {
         this.$nextTick(() =>
           window.tinymce.get(this.tinymceId).setContent(val || "")
@@ -142,8 +139,8 @@ export default {
         link_title: false,
         nonbreaking_force_tab: true, // inserting nonbreaking space &nbsp; need Nonbreaking Space Plugin
         init_instance_callback: editor => {
-          if (_this.value) {
-            editor.setContent(_this.value);
+          if (_this.content) {
+            editor.setContent(_this.content);
           }
           _this.hasInit = true;
           editor.on("NodeChange Change KeyUp SetContent", () => {
@@ -175,8 +172,8 @@ export default {
         tinymce.destroy();
       }
     },
-    setContent(value) {
-      window.tinymce.get(this.tinymceId).setContent(value);
+    setContent(content) {
+      window.tinymce.get(this.tinymceId).setContent(content);
     },
     getContent() {
       window.tinymce.get(this.tinymceId).getContent();

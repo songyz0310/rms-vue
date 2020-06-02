@@ -1,0 +1,33 @@
+.fill-view {
+  height: 100vh;
+}
+
+.layout-menu {
+  background-color: rgb(84, 92, 100);
+  transition: all 0.3s ease 0s;
+}
+
+.layout-main {
+  background: white;
+}
+
+.layout-header {
+  background: #efefef;
+  padding: 0;
+}
+
+.fill-container {
+  height: 100%;
+}
+
+.page-container {
+  height: 100%;
+}
+
+.page-header {
+  height: 35px !important;
+}
+
+.clear-padding {
+  padding: 0;
+}

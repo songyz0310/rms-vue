@@ -3,9 +3,10 @@ import Router from 'vue-router';
 
 import login from '../views/login/login';
 import layout from "../layout";
-import messageRecipient from '../views/message/recipient';
-import messageSend from '../views/message/send';
-import messageWrite from '../views/message/write';
+import recipientMessagePage from '../views/message/recipient';
+import sendedMessagePage from '../views/message/sended';
+import writeMessagePage from '../views/message/write';
+import draftMessagePage from '../views/message/draft';
 
 Vue.use(Router)
 
@@ -22,17 +23,21 @@ export default new Router({
       component: layout,
       children: [{
         path: '/message/recipient',
-        name: 'messageRecipient',
-        component: messageRecipient
+        name: 'recipientMessagePage',
+        component: recipientMessagePage
 
       }, {
-        path: '/message/send',
-        name: 'messageSend',
-        component: messageSend
+        path: '/message/sended',
+        name: 'sendedMessagePage',
+        component: sendedMessagePage
       }, {
         path: '/message/write',
-        name: 'messageWrite',
-        component: messageWrite
+        name: 'writeMessagePage',
+        component: writeMessagePage
+      }, {
+        path: '/message/draft',
+        name: 'draftMessagePage',
+        component: draftMessagePage
       }]
     },
 
