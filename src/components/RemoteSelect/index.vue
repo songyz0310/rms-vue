@@ -2,7 +2,7 @@
   <el-select
     ref="elSelect"
     v-loading="loading"
-    :disabeld="disabled"
+    :disabled="disabled"
     :clearable="clearable"
     :multiple="multiple"
     :filterable="filterable"

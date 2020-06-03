@@ -44,8 +44,8 @@
   </div>
 </template>
 <script>
-import messageApi from "../../api/message";
-import userApi from "../../api/user";
+import messageApi from "../../api/message/sender";
+import userApi from "../../api/user/index";
 
 import Tinymce from "@/components/Tinymce";
 import RemoteSelect from "@/components/RemoteSelect";
@@ -96,6 +96,11 @@ export default {
     this.myName = sessionUser.userName;
     this.myId = sessionUser.userId;
   },
+  mounted() {
+    document.body.onbeforeunload = () => {
+      return true;
+    };
+  },
   methods: {
     queryUserList(param) {
       return userApi.list(param);
@@ -125,7 +130,7 @@ export default {
     },
     createFormalMessage() {
       this.validateForm()
-        .then(() => messageApi.createFormalMessage(this.messageForm))
+        .then(() => messageApi.createFormal(this.messageForm))
         .then(result => {
           this.$confirm("信息发送成功, 是否跳转至发件箱?", "提示", {
             confirmButtonText: "确定",
@@ -133,7 +138,7 @@ export default {
             type: "success"
           })
             .then(() => {
-              this.$router.push({ path: "/message/sended" });
+              this.$router.push({ path: "/message/outBox" });
             })
             .catch(() => {
               this.messageForm.messageId = null;
@@ -148,7 +153,7 @@ export default {
     },
     createDraftMessage() {
       this.validateForm()
-        .then(() => messageApi.createDraftMessage(this.messageForm))
+        .then(() => messageApi.createDraft(this.messageForm))
         .then(result => {
           this.$confirm("信息保存成功, 是否跳转至草稿箱?", "提示", {
             confirmButtonText: "确定",
@@ -156,7 +161,7 @@ export default {
             type: "success"
           })
             .then(() => {
-              this.$router.push({ path: "/message/draft" });
+              this.$router.push({ path: "/message/draftBox" });
             })
             .catch(() => {
               this.messageForm.messageId = null;

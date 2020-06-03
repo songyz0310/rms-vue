@@ -42,7 +42,7 @@ export default {
         sessionStorage.setItem("user", JSON.stringify(user));
         sessionStorage.setItem("token", user.token);
 
-        this.$router.push({ path: "/message/sended" });
+        this.$router.push({ path: "/message/inBox" });
       });
     }
   }

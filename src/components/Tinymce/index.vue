@@ -54,6 +54,10 @@ export default {
       type: [Number, String],
       required: false,
       default: "auto"
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -122,6 +126,7 @@ export default {
         height: this.height,
         body_class: "panel-body ",
         object_resizing: false,
+        readonly: this.disabled ? true : false,
         toolbar: this.toolbar.length > 0 ? this.toolbar : toolbar,
         menubar: this.menubar,
         branding: false,

@@ -70,38 +70,38 @@ export default {
             {
               name: "写信",
               icon: null,
-              key: "writeMessagePage",
+              key: "writeMessage",
               path: "/message/write"
             },
             {
               name: "收件箱",
               icon: null,
-              key: "recipientMessagePage",
-              path: "/message/recipient"
+              key: "inBoxMessage",
+              path: "/message/inBox"
             },
             {
               name: "发件箱",
               icon: null,
-              key: "sendedMessagePage",
-              path: "/message/sended"
+              key: "outBoxMessage",
+              path: "/message/outBox"
             },
             {
               name: "草稿箱",
               icon: null,
-              key: "draftMessagePage",
-              path: "/message/draft"
+              key: "draftBoxMessage",
+              path: "/message/draftBox"
             },
             {
               name: "垃圾箱",
               icon: null,
-              key: "rubishMessagePage",
-              path: "/message/rubbish"
+              key: "rubbishBoxMessage",
+              path: "/message/rubbishBox"
             },
             {
               name: "已删除",
               icon: null,
-              key: "deletedMessagePage",
-              path: "/message/deleted"
+              key: "deletedBoxMessage",
+              path: "/message/deletedBox"
             }
           ]
         },
@@ -141,12 +141,14 @@ export default {
     },
     activeMenu(path) {
       let menu = this.allMenuMap.get(path);
-      if (menu.parentKey) {
-        this.defaultOpen = [menu.parentKey];
-      } else {
-        this.defaultOpen = [menu.key];
+      if (menu) {
+        if (menu.parentKey) {
+          this.defaultOpen = [menu.parentKey];
+        } else {
+          this.defaultOpen = [menu.key];
+        }
+        this.defaultActive = menu.key;
       }
-      this.defaultActive = menu.key;
     }
   },
   watch: {
