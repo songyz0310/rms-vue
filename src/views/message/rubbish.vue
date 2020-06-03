@@ -2,12 +2,12 @@
   <el-container class="page-container">
     <el-header class="page-header">
       <el-row>
-        <el-button size="small" type="danger">彻底删除</el-button>
+        <el-button size="small" type="danger" @click="showRealDeleteConfirm">彻底删除</el-button>
         <el-button size="small" type="success">这不是垃圾</el-button>
       </el-row>
     </el-header>
     <el-main class="page-main">
-      <data-table :requestData="queryMessageList">
+      <data-table ref="dataTable" :requestData="queryMessageList" rowKey="mrId">
         <el-table-column prop="messageId" type="selection" width="55"></el-table-column>
         <el-table-column prop="messageTitle" label="邮件标题" width="300"></el-table-column>
         <el-table-column prop="sendUser.userName" label="发送人" width="100"></el-table-column>
@@ -38,6 +38,28 @@ export default {
   methods: {
     queryMessageList(param) {
       return messageApi.rubbishList(param);
+    },
+    showRealDeleteConfirm() {
+      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+        this.$notify({
+          title: "警告",
+          message: "请选择信息",
+          type: "warning"
+        });
+        return;
+      }
+
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => this.realDeleteMessage());
+    },
+    realDeleteMessage() {
+      let ids = this.$refs["dataTable"].getSelectRows();
+      messageApi
+        .realDeleteRecipientMessage({ ids })
+        .then(result => this.$refs["dataTable"].refreshData());
     }
   }
 };

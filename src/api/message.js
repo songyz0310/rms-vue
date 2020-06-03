@@ -11,6 +11,7 @@ const createDraftMessage = (param) => request.post("/message/create/draft", para
 const deleteRecipientMessage = (param) => request.delete("/message/delete/recipient", param);
 const realDeleteRecipientMessage = (param) => request.delete("/message/delete/recipient/real", param);
 const deleteMessage = (param) => request.delete("/message/delete", param);
+const realDeleteMessage = (param) => request.delete("/message/delete/real", param);
 
 export default {
   recipientList,
@@ -23,4 +24,5 @@ export default {
   deleteRecipientMessage,
   realDeleteRecipientMessage,
   deleteMessage,
+  realDeleteMessage,
 }
