@@ -8,7 +8,16 @@
       </el-row>
     </el-header>
     <el-main class="page-main">
-      <data-table ref="dataTable" selection :requestData="queryMessageList" rowKey="mrId">
+      <data-table
+        id="draft-box-table"
+        ref="dataTable"
+        checkbox
+        :requestData="queryMessageList"
+        rowKey="mrId"
+      >
+        <el-table-column prop="sendTime" label="创建时间" width="200">
+          <template slot-scope="scope">{{ scope.row.createTime }}</template>
+        </el-table-column>
         <el-table-column prop="messageTitle" label="邮件标题" width="300" show-overflow-tooltip>
           <template slot-scope="scope">
             <el-link type="primary" @click="readMessage(scope.row)">
@@ -16,9 +25,6 @@
               <span v-else>{{ scope.row.messageTitle }}</span>
             </el-link>
           </template>
-        </el-table-column>
-        <el-table-column prop="sendTime" label="发送时间" width="200">
-          <template slot-scope="scope">{{ scope.row.sendTime }}</template>
         </el-table-column>
         <el-table-column prop="recipientUsers" label="收件人">
           <template slot-scope="scope">
@@ -48,7 +54,7 @@ export default {
       return messageApi.draftList(param);
     },
     showDeleteConfirm() {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -64,7 +70,7 @@ export default {
       }).then(() => this.deleteMessage());
     },
     showRealDeleteConfirm() {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -80,7 +86,7 @@ export default {
       }).then(() => this.realDeleteMessage());
     },
     deleteMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       messageApi
         .deleteMessage({ ids })
         .then(result => {
@@ -92,7 +98,7 @@ export default {
         .then(() => this.$refs["dataTable"].refreshData());
     },
     realDeleteMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       messageApi
         .realDeleteMessage({ ids })
         .then(result => {
@@ -107,7 +113,7 @@ export default {
       this.$refs.readMessage.show(message);
     },
     editMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       if (ids.length == 0) {
         this.$notify({
           title: "警告",
@@ -123,6 +129,22 @@ export default {
         });
         return;
       }
+
+      let message = this.$refs["dataTable"].getSelectRows()[0];
+      this.$router.push({
+        name: "writeMessagePage",
+        params: {
+          data: {
+            messageId: message.messageId,
+            messageTitle: message.messageTitle,
+            richContent: message.richContent,
+            simpleContent: message.simpleContent,
+            recipients: message.recipientUsers.map(user => user.userId),
+            refMessageId: message.refMessageId
+          },
+          formPath: this.$route.path
+        }
+      });
     }
   }
 };

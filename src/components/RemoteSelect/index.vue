@@ -62,9 +62,11 @@ export default {
       pageParam: {
         pageNo: 1,
         pageSize: 10,
-        needTotal: true
+        needTotal: true,
+        includes: null, // 当分页回显时，可能会出现不在本页的选中数据，这时将选中的参数放入此参数请求接口，接口会额外包含需要回显的参数，
+        excludes: null //由于开启了额外包含机制，可能会在后续的翻页中，查询到重复记录，所以，在后续的查询中，排除第一步选中的参数
       },
-      list: [],
+      list: null,
       total: 0,
       isAll: false
     };
@@ -86,9 +88,13 @@ export default {
     }
   },
   created: function() {
-    console.info("远程列表组件初始化");
-
-    this.queryList();
+    console.info("远程列表组件 created", this.value);
+  },
+  mounted: function() {
+    console.info("远程列表组件 mounted", this.value);
+  },
+  updated: function() {
+    console.info("远程列表组件 updated", this.value);
   },
   methods: {
     //查询第一页数据
@@ -135,6 +141,8 @@ export default {
     toggleVisible(flag) {
       if (flag == false && this.pageParam.search != undefined) {
         this.queryList();
+      } else if (flag == true && this.list == null) {
+        this.queryList();
       }
     },
     doBlur() {
@@ -148,9 +156,22 @@ export default {
       this.$emit("input", val);
     },
     "$attrs.value": function(val) {
+      if (this.value == val) {
+        return;
+      }
+
+      //当组件引用时设置了默认值，不知道为什么，value总是监控不到变化，经查不靠谱资料，可以监控$attrs.value，发现居然好用！！！
+      //结合includes和excludes，实现，默认值肯定在第一页可以正常选中显示
       console.info("==============$attrs.value==============");
       console.info(val);
       this.value = val;
+
+      this.pageParam.includes = val;
+      this.queryList().then(() => {
+        //将包含的元素，移到排除项中，
+        this.pageParam.includes = null;
+        this.pageParam.excludes = val;
+      });
     }
   }
 };

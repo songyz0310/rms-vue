@@ -3,18 +3,24 @@
     <el-main ref="elMain" class="clear-padding">
       <hr />
       <el-table
-        v-loading="loading"
+        ref="elTable"
         border
         stripe
+        :id="tableId"
         :height="height"
-        ref="multipleTable"
-        tooltip-effect="dark"
-        style="width: 100%"
         :data="data"
-        @selection-change="handleSelectionChange"
+        v-loading="loading"
+        style="width: 100%"
+        tooltip-effect="dark"
         @sort-change="handleSortChange"
+        @selection-change="handleSelectionChange"
       >
-        <el-table-column v-if="selection" class-name="selection" type="selection" width="48"></el-table-column>
+        <el-table-column
+          v-if="checkbox"
+          class-name="table-column-checkbox"
+          type="selection"
+          width="48"
+        ></el-table-column>
         <slot />
       </el-table>
       <hr />
@@ -23,11 +29,11 @@
       <div class="block" style="text-align: right;">
         <el-pagination
           background
-          :page-sizes="param.pageSizes"
+          :page-sizes="pageSizes"
           :page-size="param.pageSize"
           :current-page="param.pageNo"
-          :total="data.total"
-          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          :layout="toolbar"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         ></el-pagination>
@@ -38,6 +44,10 @@
 <script>
 export default {
   props: {
+    id: {
+      type: String,
+      default: () => "rms-table-" + (Math.random() * 100000000).toFixed(0)
+    },
     requestData: {
       type: Function,
       default: () => []
@@ -45,41 +55,53 @@ export default {
     rowKey: {
       type: String
     },
-    selection: {
+    checkbox: {
       type: Boolean,
       default: false
     }
   },
   data() {
     return {
-      loading: false,
-      height: null,
-      pageSizes: [10, 20, 30, 50],
+      tableId: this.id,
+      toolbar: "total, sizes, prev, pager, next, jumper",
+      loading: false, //是否正在加载中
+      height: null, //表格高度
+      pageSizes: [10, 30, 50, 100], //可以切换的页面条数
       param: {
-        sort: null,
-        search: null,
-        needTotal: true,
-        pageNo: 1,
-        pageSize: 10
+        //查询参数
+        sort: null, //表格排序字段
+        search: null, //表格搜索条件
+        needTotal: true, //表格查询是否需要总数
+        pageNo: 1, //表格当前页数
+        pageSize: 10 //表格当前页面分页条数
       },
-      data: null,
-      total: 0,
-      selectRows: []
+      data: [], //表格数据
+      total: 0, //表格数据总数
+      selectRows: [] //表格选中的行数
     };
   },
   created: function() {
+    let cache = localStorage.getItem(`cache-${this.tableId}`);
+    if (cache) {
+      let cacheObj = JSON.parse(cache);
+      this.param.pageSize = cacheObj.pageSize;
+    }
+
     this.queryList().then(() => (this.param.needTotal = false));
   },
   mounted() {
     this.height = this.$refs.elMain.$el.clientHeight - 36;
   },
   methods: {
-    getSelectRows() {
+    getSelectRowKeys() {
       if (this.rowKey) {
         return this.selectRows.map(row => row[this.rowKey]);
       } else {
         return this.selectRows;
       }
+    },
+    getSelectRows() {
+      return this.selectRows;
     },
     refreshData() {
       return this.queryList();
@@ -92,7 +114,7 @@ export default {
           this.loading = false;
 
           this.data = result.data;
-          if (param.needTotal) {
+          if (this.param.needTotal) {
             this.total = result.total;
           }
         })
@@ -103,10 +125,10 @@ export default {
     toggleSelection(rows) {
       if (rows) {
         rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
+          this.$refs.elTable.toggleRowSelection(row);
         });
       } else {
-        this.$refs.multipleTable.clearSelection();
+        this.$refs.elTable.clearSelection();
       }
     },
     handleSelectionChange(val) {
@@ -132,6 +154,17 @@ export default {
       console.info("============修改每页条数============");
       this.param.pageSize = val;
       console.log(`每页 ${val} 条`);
+
+      let cacheObj;
+      let cache = localStorage.getItem(`cache-${this.tableId}`);
+      if (cache) {
+        cacheObj = JSON.parse(cache);
+      } else {
+        cacheObj = {};
+      }
+      cacheObj.pageSize = val;
+      localStorage.setItem(`cache-${this.tableId}`, JSON.stringify(cacheObj));
+
       this.queryList();
     },
     handleCurrentChange(val) {

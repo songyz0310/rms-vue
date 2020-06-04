@@ -1,4 +1,5 @@
 import axios from 'axios';
+import qs from 'qs';
 import router from "../router";
 import ElementUI from 'element-ui';
 
@@ -73,6 +74,11 @@ const getFun = (url, param) => axios({
   url,
   method: 'get',
   params: param,
+  paramsSerializer: params => {
+    return qs.stringify(params, {
+      indices: false
+    })
+  },
 }).then(response => response.data.data);
 
 const putFun = (url, param) => axios({

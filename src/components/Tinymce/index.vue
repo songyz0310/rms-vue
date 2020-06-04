@@ -22,13 +22,7 @@ export default {
   props: {
     id: {
       type: String,
-      default: function() {
-        return (
-          "vue-tinymce-" +
-          +new Date() +
-          ((Math.random() * 1000).toFixed(0) + "")
-        );
-      }
+      default: () => "rms-tinymce-" + (Math.random() * 100000000).toFixed(0)
     },
     content: {
       type: String,

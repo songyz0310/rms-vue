@@ -7,7 +7,7 @@
       </el-row>
     </el-header>
     <el-main class="page-main">
-      <data-table ref="dataTable" selection :requestData="queryMessageList" rowKey="mrId">
+      <data-table id="rubbish-box-table" ref="dataTable" checkbox :requestData="queryMessageList" rowKey="mrId">
         <el-table-column prop="messageTitle" label="邮件标题" width="300" show-overflow-tooltip>
           <template slot-scope="scope">
             <el-link type="primary" @click="readMessage(scope.row)">
@@ -48,7 +48,7 @@ export default {
       return messageApi.rubbishList(param);
     },
     showRealDeleteConfirm() {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -64,13 +64,13 @@ export default {
       }).then(() => this.realDeleteMessage());
     },
     realDeleteMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       messageApi
         .realDeleteRecipientMessage({ ids })
         .then(result => this.$refs["dataTable"].refreshData());
     },
     doMarkMessage() {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -79,7 +79,7 @@ export default {
         return;
       }
 
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       messageApi
         .markMessage({ ids, type: 2 })
         .then(result => this.$refs["dataTable"].refreshData());

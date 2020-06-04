@@ -7,7 +7,7 @@
       </el-row>
     </el-header>
     <el-main class="page-main">
-      <data-table ref="dataTable" selection :requestData="queryMessageList">
+      <data-table id="deleted-box-table" ref="dataTable" checkbox :requestData="queryMessageList">
         <el-table-column prop="messageTitle" label="邮件标题" width="300" show-overflow-tooltip>
           <template slot-scope="scope">
             <el-link type="primary" @click="readMessage(scope.row)">
@@ -58,7 +58,7 @@ export default {
       }
     },
     showRealDeleteConfirm() {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -74,7 +74,7 @@ export default {
       }).then(() => this.realDeleteMessage());
     },
     realDeleteMessage() {
-      let rows = this.$refs["dataTable"].getSelectRows();
+      let rows = this.$refs["dataTable"].getSelectRowKeys();
       var arr = [];
       var mrIds = rows.filter(i => i.mrId > 0).map(i => i.mrId);
       if (mrIds.length > 0) {
@@ -93,7 +93,7 @@ export default {
         .catch(() => this.$refs["dataTable"].refreshData());
     },
     revertDeletedMessage() {
-      let rows = this.$refs["dataTable"].getSelectRows();
+      let rows = this.$refs["dataTable"].getSelectRowKeys();
       if (rows.length == 0) {
         this.$notify({
           title: "警告",
@@ -113,7 +113,7 @@ export default {
       var messageIds = rows.filter(i => i.mrId == 0).map(i => i.messageId);
       if (messageIds.length > 0) {
         console.info("messageIds", messageIds);
-        arr.push(senderApi.revertMessage({ ids: messageIds }));
+        arr.push(senderApi.revertMessage({ ids: messageIds, name: "宋印赠" }));
       }
 
       Promise.all(arr)

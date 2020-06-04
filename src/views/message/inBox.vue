@@ -20,7 +20,13 @@
       </el-row>
     </el-header>
     <el-main class="page-main">
-      <data-table ref="dataTable" selection :requestData="queryMessageList" rowKey="mrId">
+      <data-table
+        id="inbox-table"
+        ref="dataTable"
+        checkbox
+        :requestData="queryMessageList"
+        rowKey="mrId"
+      >
         <el-table-column prop="isRead" label="状态" width="50">
           <template slot-scope="scope">
             <div class="read-status">
@@ -62,7 +68,7 @@ export default {
       return messageApi.formalList(param);
     },
     showDeleteConfirm() {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -78,7 +84,7 @@ export default {
       }).then(() => this.deleteMessage());
     },
     showRealDeleteConfirm() {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -94,7 +100,7 @@ export default {
       }).then(() => this.realDeleteMessage());
     },
     deleteMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       messageApi
         .deleteMessage({ ids })
         .then(result => {
@@ -106,7 +112,7 @@ export default {
         .then(() => this.$refs["dataTable"].refreshData());
     },
     realDeleteMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       messageApi
         .realDeleteMessage({ ids })
         .then(result => {
@@ -118,7 +124,7 @@ export default {
         .then(() => this.$refs["dataTable"].refreshData());
     },
     handleMarkCommand(cmd) {
-      if (this.$refs["dataTable"].getSelectRows().length == 0) {
+      if (this.$refs["dataTable"].getSelectRowKeys().length == 0) {
         this.$notify({
           title: "警告",
           message: "请选择信息",
@@ -127,7 +133,7 @@ export default {
         return;
       }
 
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       messageApi
         .markMessage({ ids, type: cmd })
         .then(result => {
@@ -146,7 +152,7 @@ export default {
       }
     },
     forwardMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       if (ids.length == 0) {
         this.$notify({
           title: "警告",
@@ -162,9 +168,23 @@ export default {
         });
         return;
       }
+
+      let message = this.$refs["dataTable"].getSelectRows()[0];
+      this.$router.push({
+        name: "writeMessagePage",
+        params: {
+          data: {
+            messageTitle: "转发：" + message.messageTitle,
+            richContent:
+              "<p>&nbsp;</p>\r\n<p>&nbsp;</p>\r\n<p>---------------------- 原始邮件 ----------------------</p>" +
+              message.richContent
+          },
+          formPath: this.$route.path
+        }
+      });
     },
     replyMessage() {
-      let ids = this.$refs["dataTable"].getSelectRows();
+      let ids = this.$refs["dataTable"].getSelectRowKeys();
       if (ids.length == 0) {
         this.$notify({
           title: "警告",
@@ -180,6 +200,19 @@ export default {
         });
         return;
       }
+
+      let message = this.$refs["dataTable"].getSelectRows()[0];
+      this.$router.push({
+        name: "writeMessagePage",
+        params: {
+          data: {
+            messageTitle: "回复：" + message.messageTitle,
+            recipients: [message.sender],
+            refMessage: message
+          },
+          formPath: this.$route.path
+        }
+      });
     }
   }
 };

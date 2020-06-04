@@ -1,26 +1,33 @@
 <template>
   <div>
     <el-row style="margin-bottom:15px">
-      <el-button size="small" type="danger" @click="createDraftMessage">存为草稿</el-button>
-      <el-button size="small" type="success" @click="createFormalMessage">发送</el-button>
+      <el-button size="small" type="danger" @click="saveDraftMessage">存为草稿</el-button>
+      <el-button size="small" type="success" @click="saveFormalMessage">发送</el-button>
     </el-row>
     <hr />
     <el-form ref="messageForm" :rules="messageRules" :model="messageForm" label-width="80px">
-      <el-form-item label="发件人">
-        <el-input v-model="myName" disabled></el-input>
+      <el-form-item label="邮件原文" v-if="refMessage != null">
+        <el-link type="primary" @click="readMessage(refMessage)">
+          <b>{{ refMessage.messageTitle }}</b>
+        </el-link>
       </el-form-item>
-      <el-form-item label="收件人" prop="recipients">
+      <el-form-item label="发件人">
+        <el-input v-model="messageForm.sendUserName" disabled></el-input>
+      </el-form-item>
+      <el-form-item label="收件人" prop="recipients" :disabled="refMessage != null">
         <remote-select
           multiple
           ref="remoteSelect"
+          :disabled="refMessage != null"
           :requestData="queryUserList"
+          :initValue="messageForm.recipients"
           v-model="messageForm.recipients"
           placeholder="请选择收件人"
         >
           <template slot-scope="scope">
             <el-option
               v-for="user in scope.list"
-              :disabled="user.userId==myId"
+              :disabled="user.userId == messageForm.sendUser"
               :key="user.userId"
               :value="user.userId"
               :label="user.userName"
@@ -41,29 +48,35 @@
         />
       </el-form-item>
     </el-form>
+
+    <read-message ref="readMessage"></read-message>
   </div>
 </template>
 <script>
-import messageApi from "../../api/message/sender";
+import receiverApi from "../../api/message/receiver";
+import senderApi from "../../api/message/sender";
 import userApi from "../../api/user/index";
 
 import Tinymce from "@/components/Tinymce";
 import RemoteSelect from "@/components/RemoteSelect";
 
+import ReadMessage from "./components/read";
+
 export default {
-  components: { Tinymce, RemoteSelect },
+  components: { Tinymce, RemoteSelect, ReadMessage },
   data() {
     return {
-      myName: null,
-      myId: null,
+      formPath: null, //来源路径
+      refMessage: null, //原文
       messageForm: {
         messageId: null,
         messageTitle: null,
         richContent: null,
         simpleContent: null,
         sendUser: 0,
+        sendUserName: 0,
         recipients: [],
-        refMessage: null
+        refMessageId: null
       },
       messageRules: {
         recipients: [
@@ -75,8 +88,8 @@ export default {
           },
           {
             type: "array",
-            max: 3,
-            message: "收件人不能大于3人",
+            max: 5,
+            message: "收件人不能大于5人",
             trigger: "change"
           }
         ],
@@ -93,20 +106,37 @@ export default {
   created: function() {
     console.info("写信Vue create");
     let sessionUser = JSON.parse(sessionStorage.getItem("user"));
-    this.myName = sessionUser.userName;
-    this.myId = sessionUser.userId;
+    this.messageForm.sendUser = sessionUser.userId;
+    this.messageForm.sendUserName = sessionUser.userName;
+
+    let routeParam = this.$route.params; //此参数有值代表从其他列表跳转过来的
+    if (routeParam.data) {
+      this.formPath = routeParam.formPath;
+      this.messageForm.messageId = routeParam.data.messageId;
+      this.messageForm.messageTitle = routeParam.data.messageTitle;
+      this.messageForm.richContent = routeParam.data.richContent;
+      this.messageForm.simpleContent = routeParam.data.simpleContent;
+      this.$nextTick(() => {
+        this.messageForm.recipients = routeParam.data.recipients;
+      });
+
+      if (routeParam.data.refMessage) {
+        this.messageForm.refMessageId = routeParam.data.refMessage.messageId;
+        this.refMessage = routeParam.data.refMessage;
+      }
+      console.info("信息页面初始化", routeParam);
+    }
   },
-  mounted() {
-    document.body.onbeforeunload = () => {
-      return true;
-    };
-  },
+  mounted() {},
   methods: {
     queryUserList(param) {
       return userApi.list(param);
     },
     messageContentUpdate({ text, html }) {
-      this.$refs.remoteSelect.doBlur();
+      if (this.$refs.remoteSelect) {
+        this.$refs.remoteSelect.doBlur();
+      }
+
       this.messageForm.simpleContent = text;
       this.messageForm.richContent = html;
     },
@@ -128,51 +158,60 @@ export default {
         throw new Error(err);
       });
     },
-    createFormalMessage() {
+    saveFormalMessage() {
       this.validateForm()
-        .then(() => messageApi.createFormal(this.messageForm))
+        .then(() => senderApi.saveFormal(this.messageForm))
         .then(result => {
-          this.$confirm("信息发送成功, 是否跳转至发件箱?", "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "success"
-          })
-            .then(() => {
-              this.$router.push({ path: "/message/outBox" });
-            })
-            .catch(() => {
-              this.messageForm.messageId = null;
-              this.messageForm.messageTitle = null;
-              this.messageForm.richContent = null;
-              this.messageForm.simpleContent = null;
-              this.messageForm.recipients = null;
-              this.messageForm.refMessage = null;
-              this.$refs.tinymce.setContent("");
+          if (this.formPath) {
+            this.$message({
+              message: "信息发送成功",
+              type: "success"
             });
+            this.$router.push({ path: this.formPath });
+          } else {
+            this.messageForm = {};
+            this.$refs.tinymce.setContent("");
+
+            this.$confirm("信息发送成功, 是否跳转至发件箱?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "success"
+            }).then(() => {
+              this.$router.push({ path: "/message/outBox" });
+            });
+          }
         });
     },
-    createDraftMessage() {
+    saveDraftMessage() {
       this.validateForm()
-        .then(() => messageApi.createDraft(this.messageForm))
+        .then(() => senderApi.saveDraft(this.messageForm))
         .then(result => {
-          this.$confirm("信息保存成功, 是否跳转至草稿箱?", "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "success"
-          })
-            .then(() => {
-              this.$router.push({ path: "/message/draftBox" });
-            })
-            .catch(() => {
-              this.messageForm.messageId = null;
-              this.messageForm.messageTitle = null;
-              this.messageForm.richContent = null;
-              this.messageForm.simpleContent = null;
-              this.messageForm.recipients = null;
-              this.messageForm.refMessage = null;
-              this.$refs.tinymce.setContent("");
+          if (this.formPath) {
+            this.$message({
+              message: "信息保存成功",
+              type: "success"
             });
+            this.$router.push({ path: this.formPath });
+          } else {
+            this.messageForm = {};
+            this.$refs.tinymce.setContent("");
+
+            this.$confirm("信息保存成功, 是否跳转至草稿箱?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "success"
+            }).then(() => {
+              this.$router.push({ path: "/message/draftBox" });
+            });
+          }
         });
+    },
+    readMessage(message) {
+      this.$refs.readMessage.show(message);
+      if (message.isRead == 0) {
+        message.isRead = 1;
+        receiverApi.markMessage({ ids: [message.mrId], type: 1 });
+      }
     }
   }
 };

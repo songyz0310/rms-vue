@@ -13,16 +13,16 @@ const formalList = (param) => request.get("/sender/message/formal/list", param);
 const draftList = (param) => request.get("/sender/message/draft/list", param);
 
 /**
- * 创建正式信息
+ * 保存正式信息
  * @param {*} param 
  */
-const createFormal = (param) => request.post("/sender/message/create/formal", param);
+const saveFormal = (param) => request.post("/sender/message/save/formal", param);
 
 /**
- * 创建草稿信息
+ * 保存草稿信息
  * @param {*} param 
  */
-const createDraft = (param) => request.post("/sender/message/create/draft", param);
+const saveDraft = (param) => request.post("/sender/message/save/draft", param);
 
 /**
  * 删除发件信息
@@ -40,18 +40,15 @@ const realDeleteMessage = (param) => request.delete("/sender/message/real/delete
  * 永久删除发件信息
  * @param {*} param 
  */
-const revertMessage = (param) => request.delete("/sender/message/revert", param);
-
-
-
+const revertMessage = (param) => request.put("/sender/message/revert", param);
 
 
 
 export default {
   draftList,
   formalList,
-  createFormal,
-  createDraft,
+  saveFormal,
+  saveDraft,
   deleteMessage,
   realDeleteMessage,
   revertMessage,

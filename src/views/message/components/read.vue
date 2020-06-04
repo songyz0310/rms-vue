@@ -2,6 +2,21 @@
   <el-drawer :visible.sync="visible" direction="rtl" size="60%" :with-header="false">
     <el-form :model="message" label-width="80px" class="read-form">
       <slot />
+
+      <el-popover
+        v-if="message.refMessageId != null"
+        placement="bottom"
+        width="800"
+        trigger="click"
+        :title="refMessage.messageTitle"
+      >
+        <el-divider>
+          <i class="el-icon-message"></i>
+        </el-divider>
+        <div v-html="refMessage.richContent"></div>
+        <el-button slot="reference">查看原文消息</el-button>
+      </el-popover>
+
       <h2>发件人：{{message.sendUser.userName}}</h2>
       <h2 v-if="message.recipientUsers.length>0">
         收件人：
@@ -19,7 +34,7 @@
   </el-drawer>
 </template>
 <script>
-import messageApi from "../../../api/message/sender";
+import messageApi from "../../../api/message/index";
 import userApi from "../../../api/user/index";
 
 export default {
@@ -27,10 +42,12 @@ export default {
     return {
       sessionUser: null,
       visible: false,
+      seeRefMessage: false,
       message: {
         sendUser: {},
         recipientUsers: []
-      }
+      },
+      refMessage: {}
     };
   },
   mounted() {
@@ -48,6 +65,13 @@ export default {
         this.message.richContent = data.richContent;
         this.message.sendTime = data.sendTime;
         this.message.createTime = data.createTime;
+        this.message.refMessageId = data.refMessageId;
+        if (data.refMessageId) {
+          messageApi
+            .detail({ messageId: data.refMessageId })
+            .then(result => (this.refMessage = result));
+        }
+
         if (data.sendUser) {
           this.message.sendUser = data.sendUser;
         } else if (data.sender == this.sessionUser.userId) {
@@ -69,7 +93,6 @@ export default {
 <style scoped>
 .read-form {
   padding: 20px;
-  height: 100%;
 }
 .mce-container-body {
   display: none;
