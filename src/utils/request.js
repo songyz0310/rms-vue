@@ -3,7 +3,7 @@ import qs from 'qs';
 import router from "../router";
 import ElementUI from 'element-ui';
 
-axios.defaults.baseURL = "/rms-api";
+axios.defaults.baseURL = process.env.RMS_API;
 
 axios.interceptors.request.use((req) => {
   let token = sessionStorage.getItem("token")
