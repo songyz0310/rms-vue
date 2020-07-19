@@ -3,15 +3,39 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import VueI18n from 'vue-i18n'
 
 import ElementUI from 'element-ui';
+import ElementLocale from 'element-ui/lib/locale'
+import enLang from 'element-ui/lib/locale/lang/en'
+import zhLang from 'element-ui/lib/locale/lang/zh-CN'
 import 'element-ui/lib/theme-chalk/index.css';
+
+
+const ElementLang = {
+  "zh": zhLang,
+  "en": enLang,
+}
+
+const lang = localStorage.getItem("__i18n") || 'zh';
+
+ElementLocale.use(ElementLang[lang]);
 
 //引入项目样式文件
 import "./style/layout.css";
 
 Vue.config.productionTip = false
 Vue.use(ElementUI);
+
+Vue.use(VueI18n);
+
+const i18n = new VueI18n({
+  locale: lang,    // 语言标识
+  messages: {
+    'zh': require('./i18n/zh/'),   // 中文语言包
+    'en': require('./i18n/en/')    // 英文语言包
+  }
+})
 
 import {
   Pagination,
@@ -180,9 +204,15 @@ Vue.prototype.$message = Message;
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  i18n,
   router,
   components: {
     App
   },
-  template: '<App/>'
+  template: '<App/>',
+  watch: {
+    "$i18n.locale"(lang) {
+      ElementLocale.use(ElementLang[lang]);
+    }
+  }
 })

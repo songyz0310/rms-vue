@@ -1,8 +1,13 @@
 <template>
   <el-container class="clear-padding fill-container">
     <el-header class="clear-padding logo-div">
-      <img v-if="!menuObj.isCollapse" src="../../assets/logo1.png" />
-      <img v-else src="../../assets/logo2.png" />
+      <template v-if="!menuObj.isCollapse">
+        <img v-if="$i18n.locale == 'zh'" src="../../assets/logo1_zh.png" />
+        <img v-else-if="$i18n.locale == 'en'" src="../../assets/logo1_en.png" />
+      </template>
+      <template v-else>
+        <img src="../../assets/logo2.png" />
+      </template>
     </el-header>
     <el-main class="clear-padding">
       <el-menu
@@ -60,9 +65,34 @@ export default {
 
       defaultActive: null,
       defaultOpen: [],
-      menuList: [
+      menuList: [],
+      allMenuMap: null
+    };
+  },
+  created() {
+    this.initMenuList();
+
+    //将菜单转换为map方便取值
+    this.allMenuMap = new Map();
+    this.menuList.forEach(menu => {
+      this.allMenuMap.set(menu.path, menu);
+
+      if (menu.children && menu.children.length > 1) {
+        menu.children.forEach(subMenu => {
+          subMenu.parentKey = menu.key;
+          this.allMenuMap.set(subMenu.path, subMenu);
+        });
+      }
+    });
+  },
+  mounted() {
+    this.activeMenu(this.$route.path);
+  },
+  methods: {
+    initMenuList() {
+      this.menuList = [
         {
-          name: "信息管理",
+          name: this.$t("i18n.menu.messageManage"),
           icon: "el-icon-s-comment",
           key: "messageManage",
           path: null,
@@ -106,34 +136,27 @@ export default {
           ]
         },
         {
-          name: "系统管理",
+          name: "商品管理",
           icon: "el-icon-menu",
           key: "systemManage",
           path: null,
-          children: null
+          children: [
+            {
+              name: "商品列表",
+              icon: null,
+              key: "goodsList",
+              path: "/goods/list"
+            },
+            {
+              name: "待办任务",
+              icon: null,
+              key: "applyList",
+              path: "/apply/list"
+            }
+          ]
         }
-      ],
-      allMenuMap: null
-    };
-  },
-  created() {
-    //将菜单转换为map方便取值
-    this.allMenuMap = new Map();
-    this.menuList.forEach(menu => {
-      this.allMenuMap.set(menu.path, menu);
-
-      if (menu.children && menu.children.length > 1) {
-        menu.children.forEach(subMenu => {
-          subMenu.parentKey = menu.key;
-          this.allMenuMap.set(subMenu.path, subMenu);
-        });
-      }
-    });
-  },
-  mounted() {
-    this.activeMenu(this.$route.path);
-  },
-  methods: {
+      ];
+    },
     toPage(path) {
       if (this.$route.path != path) {
         this.$router.push({ path });
@@ -155,6 +178,9 @@ export default {
     $route(to, from) {
       //路由跳转动态调整打开和激活的菜单
       this.activeMenu(to.path);
+    },
+    "$i18n.locale"() {
+      this.initMenuList();
     }
   }
 };

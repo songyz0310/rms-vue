@@ -1,6 +1,6 @@
 <template>
   <el-container class="page-container">
-    <el-header class="page-header">
+    <!-- <el-header class="page-header">
       <el-row>
         <el-button size="small" type="warning" @click="showDeleteConfirm">删除</el-button>
         <el-button size="small" type="danger" @click="showRealDeleteConfirm">彻底删除</el-button>
@@ -18,7 +18,7 @@
           </el-dropdown-menu>
         </el-dropdown>
       </el-row>
-    </el-header>
+    </el-header> -->
     <el-main class="page-main">
       <data-table
         id="inbox-table"
@@ -27,7 +27,7 @@
         :requestData="queryMessageList"
         rowKey="mrId"
       >
-        <el-table-column prop="isRead" :label="$t('i18n.message.status')" width="100">
+        <el-table-column prop="isRead" label="状态" width="50">
           <template slot-scope="scope">
             <div class="read-status">
               <i v-if="scope.row.isRead == 0" class="el-icon-folder un-read"></i>
@@ -50,15 +50,15 @@
         <el-table-column prop="simpleContent" label="邮件内容" show-overflow-tooltip></el-table-column>
       </data-table>
     </el-main>
-    <read-message ref="readMessage"></read-message>
+   <!--  <read-message ref="readMessage"></read-message> -->
   </el-container>
 </template>
 <script>
 import messageApi from "../../api/message/receiver";
 import DataTable from "../../components/DataTable";
-import ReadMessage from "./components/read";
+// import ReadMessage from "./components/read";
 export default {
-  components: { DataTable, ReadMessage },
+  components: { DataTable/* , ReadMessage */ },
   data() {
     return {};
   },

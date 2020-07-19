@@ -10,6 +10,9 @@ import draftBoxMessage from '../views/message/draftBox.vue';
 import rubbishBoxMessage from '../views/message/rubbishBox.vue';
 import deletedBoxMessage from '../views/message/deletedBox.vue';
 
+import goodsList from "../views/goods/goodsList.vue";
+import applyList from "../views/goods/applyList.vue";
+
 import writeMessagePage from '../views/message/write';
 
 Vue.use(Router);
@@ -52,6 +55,16 @@ export default new Router({
         name: 'writeMessagePage',
         props: true,
         component: writeMessagePage
+      }, {
+        path: '/goods/list',
+        name: 'goodsList',
+        props: true,
+        component: goodsList
+      }, {
+        path: '/apply/list',
+        name: 'applyList',
+        props: true,
+        component: applyList
       }]
     },
 

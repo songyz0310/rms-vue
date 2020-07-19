@@ -10,6 +10,18 @@
         </span>
       </el-aside>
       <el-container class="rms-main"></el-container>
+      <el-aside class="rms-left" width="120px">
+        <el-dropdown @command="handleI18nCommand">
+          <div class="avatar-wrapper">
+            <b>{{$t("i18n.lang")}}</b>
+            <i class="el-icon-s-tools" />
+          </div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="zh">中文</el-dropdown-item>
+            <el-dropdown-item command="en">English</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-aside>
       <el-aside class="rms-left" width="130px">
         <el-dropdown @command="handleCommand">
           <div class="avatar-wrapper">
@@ -22,7 +34,7 @@
             <i class="el-icon-caret-bottom" />
           </div>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="userInfo">个人信息</el-dropdown-item>
+            <el-dropdown-item command="userInfo">{{$t("i18n.user.info")}}</el-dropdown-item>
             <el-dropdown-item command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -66,8 +78,12 @@ export default {
 
         this.$router.push({ path: "/" });
       } else {
-        console.info("查询个人信息");
+        console.info(this.$t("i18n.user.info"));
       }
+    },
+    handleI18nCommand(lang) {
+      this.$i18n.locale = lang;
+      localStorage.setItem("__i18n", lang);
     }
   }
 };

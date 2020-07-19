@@ -7,6 +7,7 @@ axios.defaults.baseURL = process.env.RMS_API;
 
 axios.interceptors.request.use((req) => {
   let token = sessionStorage.getItem("token")
+  req.headers["x-lang"] = localStorage.getItem("__i18n");
   if (token != null) {
     req.headers.token = token
   }
@@ -55,7 +56,7 @@ axios.interceptors.response.use(function (response) {
   }
   return response;
 }, function (error) {
-  if (error.response.status == 401) {
+  if (error.response && error.response.status == 401) {
     router.replace({
       path: '/'
     })

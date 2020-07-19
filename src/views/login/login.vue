@@ -29,7 +29,7 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="login">登录</el-button>
+        <el-button type="primary" @click="login">{{$t("i18n.login")}}</el-button>
         <el-button type="primary" plain @click="isLogin=false">注册</el-button>
       </el-form-item>
     </el-form>
